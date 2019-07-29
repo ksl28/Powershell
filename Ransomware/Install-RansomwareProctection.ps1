@@ -5,15 +5,7 @@
 # Version: 1.0
 #
 # Source: https://github.com/ksl28/powershell/Ransomware
-#
-# Description: Module for installing and configuring FSRM, to protect against ransomware
-#
-# Author: Kristian Leth 
-#
-# Version: 1.0
-#
-# Source: https://github.com/ksl28/powershell
-#
+
 Function Install-RansomwareProctection {
     [cmdletbinding()]
     param (
