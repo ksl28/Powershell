@@ -16,7 +16,7 @@ ZZZ_ransomprotection
 
 The folder names are named to make sure, that the folders are the first and last folders, within the share folder.
 
-The module creates a list of killswitch files, under each of the hidden folders - each with different file extensions.
+The module creates a list of killswitch files, under each of the hidden folders - each with different file extensions.  
 These files are excluded from FSRM monitoring, and hopefully encrypted in case of an Ransomware attack.
 When the HELP_DECRYPT (or similar) files are created within the same folder, then FSRM starts blocking.
 
