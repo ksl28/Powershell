@@ -60,3 +60,38 @@ Import-module <path to module> -force
     - If NOT present: Creates the File Group, with the settings from the module.
   - Excludes the killswitch files.
   - Includes everything else, inside the hidden folders.
+  
+**Set-FileScreenTemplate**
+  - Creates an script at C:\fsrm\scripts\RevokeSMBAccess.ps1 (used for blocking the infected user).
+    - The script will set Deny access on all SMB shares, if user / the ransomware creates files in the hidden folders
+  - Checks if the File Screen template is present.
+    - If present: Updates the FSRM notifications (Mail, Eventlog, Command).
+    - If NOT present: Creates the FSRM notifications (Mail, Eventlog, Command).
+  
+**Set-FileScreen**
+  - Checks if the File Screen is present, for each share defined
+    - If present: Updates the File Screen, based on the File Screen Template
+    - If NOT present: Creates the File Screen, based on the File Screen Template
+
+**Verify-ADConnectivity**
+  - ONLY USED FOR ACTIVE DIRECTORY DEPLOYMENTS!
+  - Tests if port TCP/5985 is open on the $env:LOGONSERVER
+  
+**Set-EventTrigger**
+  - ONLY USED FOR ACTIVE DIRECTORY DEPLOYMENTS!
+  - Creates an script at C:\FSRM\scripts\DisableADUser.ps1 (used for disabling the infected user).
+  - Check if the "Trigger Ransomware protection" task schedule is present.
+    - If present: Skipping
+    - If NOT present: Defines an scheduled task, that triggers on Event ID 8215 with the "SRMSVC" source
+    
+    
+
+## Examples:
+**Workgroup**
+Install-RansomwareProctection -Type WorkGroup -Shares Share1,Share2 -SMTPServer mail.domain.com -AdminMail support@domain.com -FromMail fsrm@domain.com
+  
+**ActiveDirectory**
+Install-RansomwareProctection -Type ActiveDirectory -Shares Share1,Share2 -SMTPServer mail.domain.com -AdminMail support@domain.com -FromMail fsrm@domain.com
+
+To include all non system shares (Admin$, IPC$, etc) set -Shares to "allshares"
+Install-RansomwareProctection -Type ActiveDirectory -Shares allshares -SMTPServer mail.domain.com -AdminMail support@domain.com -FromMail fsrm@domain.com
