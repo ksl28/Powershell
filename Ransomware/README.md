@@ -9,7 +9,9 @@ The module works with both Workgroup and Active Directory domain joined servers 
 
 ## How it works
 The module creates 2 **hidden** folders, under each of the shares defined
+
 _ransomprotection
+
 ZZZ_ransomprotection
 
 The folder names are named to make sure, that the folders are the first and last folders, within the share folder.
