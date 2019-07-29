@@ -4,6 +4,14 @@
 #
 # Version: 1.0
 #
+# Source: https://github.com/ksl28/powershell/Ransomware
+#
+# Description: Module for installing and configuring FSRM, to protect against ransomware
+#
+# Author: Kristian Leth 
+#
+# Version: 1.0
+#
 # Source: https://github.com/ksl28/powershell
 #
 Function Install-RansomwareProctection {
@@ -66,7 +74,7 @@ Function Install-RansomwareProctection {
         }
         
     }
-    #Finding all shares, if "allshares" was used for -Shares parameter
+    #Finds all shares, if "allshares" was used for -Shares parameter
     if ($Shares.tolower() -eq "allshares") {
         #Null the array to remove "allshares" from the list
         [array]$Shares = $null
@@ -84,11 +92,6 @@ Function Install-RansomwareProctection {
     $FSRMFileScreenTemplateName = "FST_Block_Ransomware"
     $FSRMFileGroupName = "FG_Block_Ransomware"
 
-    #Modules:
-    # Global Settings
-    # FileGroup
-    # FileScreen template
-    # FileScreen
      
     Function Verify-SmbShare {
         Foreach ($Share in $Shares) {
@@ -119,37 +122,36 @@ Function Install-RansomwareProctection {
                 Start-Sleep 9999
                 exit
             }
-            
+         
+            if ($FromMail) {
+                try {
+                    Set-FsrmSetting -FromEmailAddress $FromMail
+                    Write-Host "Global Settings: Defining the global admin mail to $FromMail..." -ForegroundColor Green
+                }
+                catch{
+                    Write-Host "Global Settings: Failed at defining the global admin... Exiting" -ForegroundColor Red
+                    $_.Exception.Message
+                    Start-Sleep 9999
+                    exit
+                }
+            }
+            if ($AdminMail) {
+                try {
+                    Set-FsrmSetting -AdminEmailAddress $AdminMail -ErrorAction Stop
+                    Write-Host "Global Settings: Setting the global admin mail to $AdminMail..." -ForegroundColor Green
+                    Send-FsrmTestEmail -ToEmailAddress $AdminMail -Confirm:$false -ErrorAction Stop
+                    Write-Host "Global Settings: Sending an testmail to $AdminMail - Please verify...!" -ForegroundColor Green
+                }
+                catch{
+                    Write-Host "Global Settings: Failed at defining the global admin or send mail... Exiting" -ForegroundColor Red
+                    $_.Exception.Message
+                    Start-Sleep 9999
+                    exit
+                }
+            }
         }
         
-        if ($FromMail) {
-            try {
-                Set-FsrmSetting -FromEmailAddress $FromMail
-                Write-Host "Global Settings: Defining the global admin mail to $FromMail..." -ForegroundColor Green
-            }
-            catch{
-                Write-Host "Global Settings: Failed at defining the global admin... Exiting" -ForegroundColor Red
-                $_.Exception.Message
-                Start-Sleep 9999
-                exit
-            }
-            
-        }
         
-        if ($AdminMail) {
-            try {
-                Set-FsrmSetting -AdminEmailAddress $AdminMail -ErrorAction Stop
-                Write-Host "Global Settings: Setting the global admin mail to $AdminMail..." -ForegroundColor Green
-                Send-FsrmTestEmail -ToEmailAddress $AdminMail -Confirm:$false -ErrorAction Stop
-                Write-Host "Global Settings: Sending an testmail to $AdminMail - Please verify...!" -ForegroundColor Green
-            }
-            catch{
-                Write-Host "Global Settings: Failed at defining the global admin or send mail... Exiting" -ForegroundColor Red
-                $_.Exception.Message
-                Start-Sleep 9999
-                exit
-            }
-        }
         try {
             Set-FsrmSetting -EventNotificationLimit "1" -ErrorAction Stop
             Set-FsrmSetting -CommandNotificationLimit "1" -ErrorAction Stop
@@ -189,7 +191,7 @@ Function Install-RansomwareProctection {
                             if ($(Get-ChildItem -Path $($Path.Path + "\" + $KillSwtichFolderName) -Recurse).count -ne $KillSwitchFileNames.Count) {
                                 foreach ($KillSwitchFileName in $KillSwitchFileNames) {
                                     $File = New-Object System.IO.FileStream $($Path.Path + "\" + $KillSwtichFolderName +"\" + $KillSwitchFileName), Create, ReadWrite
-                                    $File.SetLength(8MB)
+                                    $File.SetLength(2MB)
                                     $File.Close() | Out-Null
                                 }    
                                 Write-Host "File System - file: Missing killswitch files in $($Path.Path + "\" + $KillSwtichFolderName)... Creating them" -ForegroundColor yellow
