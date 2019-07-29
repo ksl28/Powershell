@@ -65,7 +65,7 @@ Import-module C:\path\to\file\Install-RansomwareProtection.ps1 -force
   
 **Set-FileScreenTemplate**
   - Creates an script at C:\fsrm\scripts\RevokeSMBAccess.ps1 (used for blocking the infected user).
-    - The script will set Deny access on all SMB shares, if user / the ransomware creates files in the hidden folders.
+    - The script will set Deny access on all SMB shares, if the user / the ransomware creates files in the hidden folders.
   - Checks if the File Screen template is present.
     - If present: Updates the FSRM notifications (Mail, Eventlog, Command).
     - If NOT present: Creates the FSRM notifications (Mail, Eventlog, Command).
