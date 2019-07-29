@@ -33,7 +33,7 @@ An user account with access, to disable user accounts in Active Directory
 Access to all domain controllers on port TCP/5985 from the server, hosting the FSRM role.  
 
 ## Installation:
-Import-module <path to module> -force
+Import-module "<path to module>" -force
 
 ## Features included:
 **General**
