@@ -27,9 +27,9 @@ For Active Directory deployments, the user is locked out of **all smbshares** in
 
 
 ## Requirements:
-Powershell 5 or higher  
+Powershell 5 or higher.  
 Active Directory deployments only:  
-An user account with access, to disable user accounts in Active Directory  
+An user account with access, to disable user accounts in Active Directory.  
 Access to all domain controllers on port TCP/5985 from the server, hosting the FSRM role.  
 
 ## Installation:
@@ -37,24 +37,24 @@ Import-module C:\path\to\file\Install-RansomwareProtection.ps1 -force
 
 ## Features included:
 **General**
-  - Installs FSRM if not already installed
-  - Creates folder at C:\fsrm
+  - Installs FSRM if not already installed.
+  - Creates folder at C:\fsrm.
 
 **Verify-SMBShare**
-  - Verifies that the share(s) are present
-  - Verifies that the file system path is present
+  - Verifies that the share(s) are present.
+  - Verifies that the file system path is present.
 
 **Set-FSRMGlobalSettings**
-  - Defines global SMTP server
-  - Defines global Admin recipient
-  - Defines global source mail
-  - Sends test mail to verify the mail flow
-  - Defines notification limits (Eventlog and Command)
+  - Defines global SMTP server.
+  - Defines global Admin recipient.
+  - Defines global source mail.
+  - Sends test mail to verify the mail flow.
+  - Defines notification limits (Eventlog and Command).
 
 **Set-FSRMFileSystem**
-  - Checks if the 2 folders are already present
-    - If present: updates the folder with new killswitch files
-    - If NOT present: creates the folders, and add the killswitch files
+  - Checks if the 2 folders are already present.
+    - If present: updates the folder with new killswitch files.
+    - If NOT present: creates the folders, and add the killswitch files.
 
 **Set-FileGroup**
   - Checks if the FSRM File Group is already present.
@@ -65,15 +65,15 @@ Import-module C:\path\to\file\Install-RansomwareProtection.ps1 -force
   
 **Set-FileScreenTemplate**
   - Creates an script at C:\fsrm\scripts\RevokeSMBAccess.ps1 (used for blocking the infected user).
-    - The script will set Deny access on all SMB shares, if user / the ransomware creates files in the hidden folders
+    - The script will set Deny access on all SMB shares, if user / the ransomware creates files in the hidden folders.
   - Checks if the File Screen template is present.
     - If present: Updates the FSRM notifications (Mail, Eventlog, Command).
     - If NOT present: Creates the FSRM notifications (Mail, Eventlog, Command).
   
 **Set-FileScreen**
-  - Checks if the File Screen is present, for each share defined
-    - If present: Updates the File Screen, based on the File Screen Template
-    - If NOT present: Creates the File Screen, based on the File Screen Template
+  - Checks if the File Screen is present, for each share defined.
+    - If present: Updates the File Screen, based on the File Screen Template.
+    - If NOT present: Creates the File Screen, based on the File Screen Template.
 
 **Verify-ADConnectivity**
   - ONLY USED FOR ACTIVE DIRECTORY DEPLOYMENTS!
