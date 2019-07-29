@@ -17,20 +17,20 @@ ZZZ_ransomprotection
 The folder names are named to make sure, that the folders are the first and last folders, within the share folder.
 
 The module creates a list of killswitch files, under each of the hidden folders - each with different file extensions.  
-These files are excluded from FSRM monitoring, and hopefully encrypted in case of an Ransomware attack.
+These files are excluded from FSRM monitoring, and hopefully encrypted in case of an Ransomware attack.  
 When the HELP_DECRYPT (or similar) files are created within the same folder, then FSRM starts blocking.
 
-For Workgroup deployments, the user is locked out of **all smbshares** instantly.
+For Workgroup deployments, the user is locked out of **all smbshares** instantly.  
 For Active Directory deployments, the user is locked out of **all smbshares** instantly, but also disabled within Active Directory.
 
 
 
 
 ## Requirements:
-Powershell 5 or higher
-Active Directory deployments only:
-An user account with access, to disable user accounts in Active Directory
-Access to all domain controllers on port TCP/5985 from the server, hosting the FSRM role.
+Powershell 5 or higher  
+Active Directory deployments only:  
+An user account with access, to disable user accounts in Active Directory  
+Access to all domain controllers on port TCP/5985 from the server, hosting the FSRM role.  
 
 ## Installation:
 Import-module <path to module> -force
