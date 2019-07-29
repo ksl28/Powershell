@@ -1,7 +1,7 @@
 # Ransomware Protection by FSRM
 
 ## Description:
-Powershell script that contains a single module, to install, configure and update FSRM, in order to block Ransomware.
+Powershell script that contains a single module to install, configure and update FSRM, in order to block Ransomware.
 The module is designed to either create the initial configuration, if none of the settings are present.
 If the settings are present, it will update the definitions instead.
 
