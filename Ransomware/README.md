@@ -28,6 +28,7 @@ For Active Directory deployments, the user is locked out of **all smbshares** in
 
 ## Requirements:
 Powershell 5 or higher.  
+Windows Server 2016 or higher.  
 Active Directory deployments only:  
 An user account with access, to disable user accounts in Active Directory.  
 Access to all domain controllers on port TCP/5985 from the server, hosting the FSRM role.  
