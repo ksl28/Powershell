@@ -90,10 +90,10 @@ Import-module C:\path\to\file\Install-RansomwareProtection.ps1 -force
     
 
 ## Examples:
-**Workgroup**
+**Workgroup**  
 Install-RansomwareProctection -Type WorkGroup -Shares Share1,Share2 -SMTPServer mail.domain.com -AdminMail support@domain.com -FromMail fsrm@domain.com
   
-**ActiveDirectory**
+**ActiveDirectory**  
 Install-RansomwareProctection -Type ActiveDirectory -Shares Share1,Share2 -SMTPServer mail.domain.com -AdminMail support@domain.com -FromMail fsrm@domain.com
 
 To include all non system shares (Admin$, IPC$, etc) set -Shares to "allshares".  
