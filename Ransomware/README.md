@@ -2,7 +2,7 @@
 
 ## Description:
 Powershell script that contains a single module to install, configure and update FSRM, in order to block Ransomware.
-The module is designed to either create the initial configuration, if none of the settings are present.
+The module is designed to either create the initial configuration, if none of the settings are present.  
 If the settings are present, it will update the definitions instead.
 
 The module works with both Workgroup and Active Directory domain joined servers (read Features list for more info).
