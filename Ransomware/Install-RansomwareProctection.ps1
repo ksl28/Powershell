@@ -2,10 +2,10 @@
 #
 # Author: Kristian Leth 
 #
-# Version: 1.0
+# Version: 1.1
 #
-# Source: https://github.com/ksl28/powershell/Ransomware
-
+# Source: https://github.com/ksl28/powershell
+#
 Function Install-RansomwareProctection {
     [cmdletbinding()]
     param (
@@ -25,8 +25,7 @@ Function Install-RansomwareProctection {
     #Running prereqs 
     if ($PSVersionTable.PSVersion.Major -lt "5") {
         Write-Host "Powershell version 5 or higher is required! - exiting" -ForegroundColor Red
-        Start-Sleep 9999
-        exit
+        break
     }
     if ($(Get-WindowsFeature -Name FS-Resource-Manager).InstallState -ne "Installed") {
         Write-Host "FSRM is not installed... Installing it" -ForegroundColor Yellow
@@ -36,8 +35,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "Failed to install FSRM - aborting!" -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit
+            break
         }
         
         Try {
@@ -46,8 +44,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "Failed to import FSRM module... exiting" -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit
+            break
         }
 
         #After FSRM installation the service is required to be restarted...
@@ -57,8 +54,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "Failed to configure the FSRM service... exiting" -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit  
+            break
         }
 
         if (!(Test-Path -Path c:\fsrm\scripts)) {
@@ -67,25 +63,25 @@ Function Install-RansomwareProctection {
         
     }
     #Finds all shares, if "allshares" was used for -Shares parameter
-    if ($Shares.tolower() -eq "allshares") {
+    if ($Shares -eq "allshares") {
         #Null the array to remove "allshares" from the list
-        [array]$Shares = $null
+        $Shares = @()
         $SMBShares = Get-SmbShare -Special:$false | Select-Object Name 
         foreach ($SMBShare in $SMBShares) {
-            [array]$Shares += $SMBShare.name
+            $Shares += @($SMBShare.name)
         }
     }
     
         
     #Global
     
-    [array]$Global:KillSwitchFileNames = "killswitch.txt","killswitch.doc","killswitch.docx","killswitch.pdf","killswitch.jpg","killswitch.png"
-    [array]$Global:KillSwtichFolderNames = "_ransomprotection","ZZZ_ransomprotection"
+    $KillSwitchFileNames = @("killswitch.txt","killswitch.doc","killswitch.docx","killswitch.pdf","killswitch.jpg","killswitch.png")
+    $KillSwitchFolderNames = @("_ransomprotection","ZZZ_ransomprotection")
     $FSRMFileScreenTemplateName = "FST_Block_Ransomware"
     $FSRMFileGroupName = "FG_Block_Ransomware"
 
      
-    Function Verify-SmbShare {
+    Function Approve-SmbShare {
         Foreach ($Share in $Shares) {
             try {
                 Get-SmbShare -Name $Share -ErrorAction Stop | Out-Null
@@ -93,8 +89,7 @@ Function Install-RansomwareProctection {
             catch {
                 Write-Host "Verify SMB Share: Failed at finding share $($Share) - check for typo" -ForegroundColor Red
                 #Sleeping to make sure, that user will see the error
-                Start-Sleep -Seconds 9999
-                exit
+                break
             }
         }
     }
@@ -111,8 +106,7 @@ Function Install-RansomwareProctection {
             catch {
                 Write-Host "Global Settings: Failed at defining the SMTPServer... Exiting" -ForegroundColor Red
                 $_.Exception.Message
-                Start-Sleep 9999
-                exit
+                break
             }
          
             if ($FromMail) {
@@ -123,8 +117,7 @@ Function Install-RansomwareProctection {
                 catch{
                     Write-Host "Global Settings: Failed at defining the global admin... Exiting" -ForegroundColor Red
                     $_.Exception.Message
-                    Start-Sleep 9999
-                    exit
+                    break
                 }
             }
             if ($AdminMail) {
@@ -137,8 +130,7 @@ Function Install-RansomwareProctection {
                 catch{
                     Write-Host "Global Settings: Failed at defining the global admin or send mail... Exiting" -ForegroundColor Red
                     $_.Exception.Message
-                    Start-Sleep 9999
-                    exit
+                    break
                 }
             }
         }
@@ -152,8 +144,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "Global Settings: Failed at defining the global notification limits... Exiting" -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit 
+            break
         }
         Write-Host ""
     }
@@ -164,7 +155,7 @@ Function Install-RansomwareProctection {
             try {
                 $Path = Get-SmbShare -Name $Share
                 if ($(Test-Path -Path $Path.path) -eq "True") {
-                    foreach ($KillSwtichFolderName in $KillSwtichFolderNames) {
+                    foreach ($KillSwtichFolderName in $KillSwitchFolderNames) {
                     #Ensure that the folder isnt already present
                         if ($(Test-Path -Path $($Path.path + "\" + $KillSwtichFolderName)) -ne "True") {
                             Write-Host "File System: Found the path $($path.Path) - creating folder $KillSwtichFolderName" -ForegroundColor Green
@@ -195,15 +186,15 @@ Function Install-RansomwareProctection {
             catch {
                 Write-Host "Failed at storing $KillSwitchFileName at $($Path.Path + "\" + $KillSwtichFolderName)" -ForegroundColor Red
                 $_.Exception.Message
-                Start-Sleep 9999
-                exit
+                break
             }
         }
     Write-Host ""
     }
 
     function Set-FileGroup {
-        Write-Host ":::File Group Settings:::" -ForegroundColor Green
+        Write-Host ":File Group Settings:" -ForegroundColor Green
+        
         Try {
             #Making sure that the group is not present - otherwise its being updated
             if (Get-FsrmFileGroup -Name $FSRMFileGroupName -ErrorAction SilentlyContinue) {
@@ -217,7 +208,7 @@ Function Install-RansomwareProctection {
                 catch {
                     Write-Host "File Group: Failed at creating the FSRM File Group" -ForegroundColor Red
                     $_.Exception.Message  
-                    Start-Sleep 9999 
+                    break
                 }
                 Write-Host "File Group: File Group $FSRMFileGroupName is NOT present... Creating and excluding $($Global:KillSwitchFileNames.Count) files" -ForegroundColor Green
             }
@@ -225,7 +216,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "File Group: Failed at creating or updating the FSRM File Group" -ForegroundColor Red
             $_.Exception.Message  
-            Start-Sleep 9999
+            break
         }
     Write-Host ""
     }
@@ -240,8 +231,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "File Screen Template: Failed Creating the Command file at $CommandFile..." -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit
+            break
         }
         
         try {
@@ -262,8 +252,7 @@ Function Install-RansomwareProctection {
         catch {
             Write-Host "File Screen Template: Failed at creating or updating the FileScreenTemplate!" -ForegroundColor Red
             $_.Exception.Message  
-            Start-Sleep 9999 
-            exit  
+            break 
         }
     Write-Host ""
     }
@@ -271,7 +260,7 @@ Function Install-RansomwareProctection {
     function Set-FileScreen {
         Write-Host ":::File Screen Settings:::" -ForegroundColor Green
         foreach ($Share in $Shares) {
-            foreach ($KillSwtichFolderName in $KillSwtichFolderNames) {
+            foreach ($KillSwtichFolderName in $KillSwitchFolderNames) {
                 $SharePath = $(Get-SmbShare -Name $Share).Path + "\" + $KillSwtichFolderName
                 try {
                     if (Get-FsrmFileScreen -Path $SharePath -ErrorAction SilentlyContinue) {
@@ -286,15 +275,14 @@ Function Install-RansomwareProctection {
                 catch {
                     Write-Host "File Screen: Failed at creating or updating the File Screen!" -ForegroundColor Red
                     $_.Exception.Message  
-                    Start-Sleep 9999    
-                    exit
+                    break
                 }
             }
         }
     Write-Host ""
     }
 
-    function Verify-ADConnectivity {
+    function Approve-ADConnectivity {
         $DomainController = $env:LOGONSERVER.Trim("\")
         
         $YesOrNo = Read-Host "AD Connectivity: Is port TCP/5985 is open on $DomainController - Ensure that it is! (y/n)"
@@ -311,14 +299,12 @@ Function Install-RansomwareProctection {
             }
             else {
                 Write-Host "AD Connectivity: Port 5985 is NOT open - exiting..." -ForegroundColor Red
-                Start-Sleep 9999    
-                exit
+                break
             }
         }
         else {
             Write-Host "AD Connectivity: Port 5985 is NOT open - exiting..." -ForegroundColor Red
-            Start-Sleep 9999    
-            exit   
+            break
         }
 
         Write-Host ""        
@@ -342,8 +328,7 @@ Invoke-Command -ComputerName $DomainController -ScriptBlock {Disable-ADAccount -
         catch {
             Write-Host "AD Event Trigger: Failed Creating the Command file at $ADCommandFile..." -ForegroundColor Red
             $_.Exception.Message
-            Start-Sleep 9999
-            exit
+            break
         }
         $SchedTaskName = "Trigger Ransomware protection"
         
@@ -353,10 +338,9 @@ Invoke-Command -ComputerName $DomainController -ScriptBlock {Disable-ADAccount -
         else {
             try {
                 $SchedTaskAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -file $ADCommandFile" -ErrorAction stop
-                $SchedTrigger = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler | New-CimInstance -ClientOnly -ErrorAction stop
+                $SchedTrigger = Get-CimClass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler | New-CimInstance -ClientOnly -ErrorAction stop
                 $SchedTrigger.Enabled = $true 
                 $SchedTrigger.Subscription = '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''SRMSVC''] and EventID=8215]]</Select></Query></QueryList>' 
-                $Action = New-ScheduledTaskAction @SchedTaskAction -ErrorAction stop
                 $Settings = New-ScheduledTaskSettingsSet -ErrorAction stop
                 $RegSchTaskParameters = @{ 
                 TaskName    = $SchedTaskName
@@ -375,19 +359,18 @@ Invoke-Command -ComputerName $DomainController -ScriptBlock {Disable-ADAccount -
             catch {
                 Write-Host "Task Scheduler: Failed at creating the Scheduled task" -ForegroundColor Red
                 $_.Exception.Message  
-                Start-Sleep 9999    
-                exit
+                break
             }
         }
     }
 
     switch ($Type) {
-        "WorkGroup" {
-            cls
+        WorkGroup {
+            Clear-Host
             Write-Host "############################" -ForegroundColor White
             Write-Host "### WORKGROUP DEPLOYMENT ###" -ForegroundColor White
             Write-Host "############################" -ForegroundColor White
-            Verify-SmbShare
+            Approve-SmbShare
             Set-FSRMGlobalSettings
             Set-FSRMFileSystem
             Set-FileGroup
@@ -395,13 +378,13 @@ Invoke-Command -ComputerName $DomainController -ScriptBlock {Disable-ADAccount -
             Set-FileScreen
         }
 
-        "ActiveDirectory" {
-            cls
+        ActiveDirectory {
+            Clear-Host
             Write-Host "##################################" -ForegroundColor White 
             Write-Host "### ACTIVEDIRECTORY DEPLOYMENT ###" -ForegroundColor White
             Write-Host "##################################" -ForegroundColor White
-            Verify-SmbShare
-            Verify-ADConnectivity
+            Approve-SmbShare
+            Approve-ADConnectivity
             Set-FSRMGlobalSettings
             Set-FSRMFileSystem
             Set-FileGroup
