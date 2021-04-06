@@ -3,8 +3,8 @@ function Get-SecureString {
         [parameter(Mandatory=$true)]$SecureString
     )
     try {
-        $SecureString | Unprotect-CmsMessage -ErrorAction stop    
-        return $SecureString
+        $UnsecureString = $SecureString | Unprotect-CmsMessage -ErrorAction stop    
+        return $UnsecureString
     }
     catch {
         $_.Exception.Message
