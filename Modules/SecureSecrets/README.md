@@ -25,7 +25,8 @@ $Cert = Get-ChildItem Cert:\CurrentUser\My | Where-Object {$_.Subject -eq "CN=Ce
 New-SecureCredential -Credential $(Get-Credential) -Certificate $Cert.Subject -SavePath C:\path\to\secret.txt  
 
 **Get-SecureCredential**  
-$credfile = Get-SecureCredential -SecureCredential $(Get-Content C:\path\to\secret.txt)  
+$CredentialFile = Get-Content "C:\path\to\secret.txt"  
+$credfile = Get-SecureCredential -SecureCredential $CredentialFile  
 New-PSSession -ComputerName "server.domain.tld" -Credential $credfile  
 
 **Get-SecureString**  
