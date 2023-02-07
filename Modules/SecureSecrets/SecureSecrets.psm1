@@ -6,12 +6,8 @@ foreach ($function in @($Public + $Private)) {
         Import-Module $function.FullName -ErrorAction stop
     }
     catch {
-        Write-Host "Failed to import $($function.fullname)" -ForegroundColor red
-        $_.Exception.Message
-        break
+        throw "Failed to import $($function.fullname) - $($_.Exception.Message)"
     }
 }
-## Export all of the public functions making them available to the user
-foreach ($file in $Public) {
-    Export-ModuleMember -Function $file.BaseName
-}
+Export-ModuleMember -Function $public.Basename
+
