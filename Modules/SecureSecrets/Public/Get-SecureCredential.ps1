@@ -9,9 +9,7 @@ function Get-SecureCredential {
         return $UnsecureCredential   
     }
     catch {
-        Write-Host "Failed to decrypt the credentials!" -ForegroundColor red
-        $_.Exception.Message
-        break
+        throw "Failed to decrypt the credentials! - $($_.Exception.Message)"
     }
     
 } 

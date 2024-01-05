@@ -12,5 +12,11 @@ function New-SecureCertificate {
         Type                = "DocumentEncryptionCert"
         NotAfter            = $(Get-Date).AddYears($YearsValid)
     }
-    New-SelfSignedCertificate @CertValues
+    try {
+        New-SelfSignedCertificate @CertValues -ErrorAction stop
+    }
+    catch {
+        throw "Failed to create a new certificate for the SecureSecrets module - $($_.Exception.Message)"
+    }
+    
 }

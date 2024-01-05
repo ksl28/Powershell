@@ -9,7 +9,7 @@ function New-SecureCredential {
         password = $Credential.GetNetworkCredential().Password
     }
     try {
-        $CMSMessage = Protect-CmsMessage -To $Certificate -Content ($cred | ConvertTo-Json)
+        $CMSMessage = Protect-CmsMessage -To $Certificate -Content ($cred | ConvertTo-Json) -ErrorAction stop
         if ($SavePath) {
             $CMSMessage | Out-File -FilePath $SavePath -Encoding utf8 -Force
         }
@@ -18,8 +18,6 @@ function New-SecureCredential {
         }    
     }
     catch {
-        $_.Exception.Message
-        break
+        throw "Failed to create a new secure credential - $($_.Exception.Message)" 
     }
-    
 }

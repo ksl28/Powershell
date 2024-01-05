@@ -12,7 +12,7 @@
 RootModule = 'SecureSecrets.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.3'
+ModuleVersion = '0.0.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@ CompanyName = 'CTX'
 Copyright = '(c) Kristian Leth. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Extremely simple wrapper that utilizes Microsofts CMS module'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -69,10 +69,10 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = '*'
+FunctionsToExport = @('New-SecureString','Get-SecureString','New-SecureCertificate','New-SecureCredential','Get-SecureCredential')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @('New-SecureString','Get-SecureString','New-SecureCertificate','New-SecureCredential','New-SecureString')
+CmdletsToExport = '*'
 
 # Variables to export from this module
 VariablesToExport = '*'

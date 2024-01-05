@@ -7,8 +7,7 @@ function Get-SecureString {
         return $UnsecureString
     }
     catch {
-        $_.Exception.Message
-        break
+        throw "Failed to decrypt the Secure string - $($_.Exception.Message)"
     }
     
 }

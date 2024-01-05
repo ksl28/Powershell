@@ -14,8 +14,7 @@ function New-SecureString {
         } 
     }
     catch {
-       $_.Exception.Message
-       break 
+        throw "Failed to create a new secure string - $($_.Exception.Message)" 
     }
     
 }
